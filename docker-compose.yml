@@ -1,6 +1,19 @@
 version: '3.2'
 
 services:
+  # clickhouse-server:
+  #   image: yandex/clickhouse-server
+  #   networks:
+  #     - elk
+  #   ports:
+  #     - "8123:8123"
+  #     - "9000:9000"
+  #     - "9004:9004"
+  #   expose:
+  #     - 9009
+  #   volumes:
+  #       - ./Shanghai:/etc/localtime ## 挂载位置（kafka镜像和宿主机器之间时间保持一直）
+  #       - ./clickhouse/config.xml:/etc/clickhouse-server/config.xml
   zookeeper:
     image: wurstmeister/zookeeper   ## 镜像
     ports:
@@ -10,7 +23,7 @@ services:
   kafka:
     image: wurstmeister/kafka       ## 镜像
     volumes:
-        - /etc/localtime:/etc/localtime ## 挂载位置（kafka镜像和宿主机器之间时间保持一直）
+        - ./Shanghai:/etc/localtime ## 挂载位置（kafka镜像和宿主机器之间时间保持一直）
     ports:
       - "9092:9092"
     environment:
@@ -52,7 +65,7 @@ services:
         target: /usr/share/elasticsearch/config/elasticsearch.yml
         read_only: true
       - type: bind
-        source: /etc/localtime
+        source: ./Shanghai
         target: /etc/localtime
         read_only: true
       # - type: volume
@@ -85,13 +98,13 @@ services:
         target: /usr/share/logstash/pipeline
         read_only: true
       - type: bind
-        source: /etc/localtime
+        source: ./Shanghai
         target: /etc/localtime
         read_only: true
     ports:
       - "5044:5044"
-      - "5000:5000/tcp"
-      - "5000:5000/udp"
+      # - "5000:5000/tcp"
+      # - "5000:5000/udp"
       - "9600:9600"
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
@@ -112,7 +125,7 @@ services:
         target: /usr/share/kibana/config/kibana.yml
         read_only: true
       - type: bind
-        source: /etc/localtime
+        source: ./Shanghai
         target: /etc/localtime
         read_only: true
     ports:
