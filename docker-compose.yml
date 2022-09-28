@@ -27,7 +27,7 @@ services:
     ports:
       - "9092:9092"
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: 192.168.32.64   ## 修改:宿主机IP
+      KAFKA_ADVERTISED_HOST_NAME: 192.168.32.64  ## 修改:宿主机IP
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181       ## 卡夫卡运行是基于zookeeper的
       KAFKA_ADVERTISED_PORT: 9092
       KAFKA_LOG_RETENTION_HOURS: 120
@@ -40,20 +40,20 @@ services:
       - zookeeper
     networks:
       - elk
-  kafka-manager:
-    image: slpcat/kafka-manager                ## 镜像：开源的web管理kafka集群的界面
-    environment:
-      ZK_HOSTS: zookeeper:2181                 ## 修改:宿主机IP
-      KAFKA_BROKERS: kafka:9092
-      APPLICATION_SECRET: letmein
-      KM_ARGS: -Djava.net.preferIPv4Stack=true
-    ports:
-      - "9001:9000"    ## 暴露端口
-    depends_on:
-      - zookeeper
-      - kafka
-    networks:
-      - elk
+  # kafka-manager:
+  #   image: slpcat/kafka-manager                ## 镜像：开源的web管理kafka集群的界面
+  #   environment:
+  #     ZK_HOSTS: zookeeper:2181                 ## 修改:宿主机IP
+  #     KAFKA_BROKERS: kafka:9092
+  #     APPLICATION_SECRET: letmein
+  #     KM_ARGS: -Djava.net.preferIPv4Stack=true
+  #   ports:
+  #     - "9001:9000"    ## 暴露端口
+  #   depends_on:
+  #     - zookeeper
+  #     - kafka
+  #   networks:
+  #     - elk
   elasticsearch:
     build:
       context: elasticsearch/
@@ -74,8 +74,15 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
+    deploy:
+      resources:
+         limits:
+            # cpus: "2.00"
+            memory: 1G
+         # reservations:
+         #    memory: 200M
     environment:
-      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ES_JAVA_OPTS: "-Xmx512m -Xms512m"
       ELASTIC_PASSWORD: changeme
       # Use single node discovery in order to disable production mode and avoid bootstrap checks.
       # see: https://www.elastic.co/guide/en/elasticsearch/reference/7.15/bootstrap-checks.html

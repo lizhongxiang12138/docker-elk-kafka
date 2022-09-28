@@ -1,0 +1,22 @@
+version: '3.2'
+
+services:
+  centos7:
+    image: django:centos7
+    networks:
+      - centos
+    ports:
+      - "5600:5600"
+      - "5850:5850"
+      - "5801:5801"
+      - "5870:5870"
+      - "8000:8000"
+    expose:
+      - 8000
+
+networks:
+  centos:
+    driver: bridge
+#
+# volumes:
+#   elasticsearch:

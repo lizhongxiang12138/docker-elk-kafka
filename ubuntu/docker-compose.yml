@@ -1,0 +1,24 @@
+version: '3.2'
+
+services:
+  # ubuntu:
+  #   image: ubuntu:latest
+  #   command: /bin/bash
+  #   networks:
+  #     - ubuntu
+  #   # ports:
+  #   #   - "8123:8123"
+  #   #   - "9000:9000"
+  #   #   - "9004:9004"
+  #   # expose:
+  #   #   - 9009
+  #   volumes:
+  #       - ./Shanghai:/etc/localtime ## 挂载位置（kafka镜像和宿主机器之间时间保持一直）
+  #       # - ./clickhouse/config.xml:/etc/clickhouse-server/config.xml
+
+networks:
+  ubuntu:
+    driver: bridge
+#
+# volumes:
+#   elasticsearch:
