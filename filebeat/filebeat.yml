@@ -1,0 +1,64 @@
+filebeat.inputs:
+- type: kafka
+  hosts:
+    - kafka:9092
+  topics: ["kibana_log"]
+  group_id: "es_filebeat"
+
+processors:
+  - copy_fields:
+      fields:
+        - from: message
+          to: kafka_msg
+      fail_on_error: false
+      ignore_missing: true
+  - drop_fields:
+      fields: ["message"]
+      ignore_missing: false
+  - decode_json_fields:
+      fields: ["kafka_msg"]
+      process_array: false
+      max_depth: 1
+      target: ""
+      overwrite_keys: false
+      add_error_key: true
+  - script:
+      lang: javascript
+      id: my_filter
+      tag: enable
+      source: >
+        function process(event) {
+            var dateUnix= event.Get("timestamp");
+            var date = new Date(1000*dateUnix);
+            var Y = date.getFullYear() + '-';
+            var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+            var D = date.getDate() <10 ? '0'+date.getDate()+' '  : date.getDate() + ' ';
+            var h = date.getHours() < 10 ? '0'+ date.getHours() + ':' : date.getHours() + ':';
+            var m = date.getMinutes() < 10 ? '0' + date.getMinutes() + ':' : date.getMinutes() + ':';
+            var s = date.getSeconds() < 10 ? '0'+date.getSeconds() : date.getSeconds();
+            var dateStr = Y+M+D+h+m+s
+            event.Put("start_time",dateStr);
+        }
+  - timestamp:
+      field: start_time
+      layouts:
+        - '2006-01-02 15:04:05'
+        - '2006-01-02 15:04:05.999'
+  - drop_fields:
+      fields: ["timestamp","start_time","ecs","input","kafka","kafka_msg"]
+      ignore_missing: false
+
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+  username: "elastic"
+  password: "changeme"
+  index: "lzxapplogs-%{[business]}-%{+yyyy.MM.dd}"
+
+setup.ilm.enabled: false
+setup.template.fields: "applogsfields.yml"
+setup.template.name: "lzxapplogs"
+setup.template.pattern: "lzxapplogs-*"
+setup.template.enabled: true
+setup.template.overwrite: true
+monitoring.enabled: false
+# output.console.pretty: true

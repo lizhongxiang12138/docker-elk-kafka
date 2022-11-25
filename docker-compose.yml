@@ -90,36 +90,52 @@ services:
     networks:
       - elk
 
-  logstash:
-    build:
-      context: logstash/
-      args:
-        ELK_VERSION: $ELK_VERSION
-    volumes:
-      - type: bind
-        source: ./logstash/config/logstash.yml
-        target: /usr/share/logstash/config/logstash.yml
-        read_only: true
-      - type: bind
-        source: ./logstash/pipeline
-        target: /usr/share/logstash/pipeline
-        read_only: true
-      - type: bind
-        source: ./Shanghai
-        target: /etc/localtime
-        read_only: true
-    ports:
-      - "5044:5044"
-      # - "5000:5000/tcp"
-      # - "5000:5000/udp"
-      - "9600:9600"
-    environment:
-      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-    networks:
-      - elk
-    depends_on:
-      - elasticsearch
-      - kafka
+  filebeat:
+      image: docker.elastic.co/beats/filebeat:$ELK_VERSION
+      # 这里映射日志文件
+      volumes:
+        - type: bind
+          source: ./filebeat/filebeat.yml
+          target: /usr/share/filebeat/filebeat.yml
+        - type: bind
+          source: ./filebeat/applogsfields.yml
+          target: /usr/share/filebeat/applogsfields.yml
+      depends_on:
+        - elasticsearch
+        - kafka
+      networks:
+        - elk
+
+  # logstash:
+  #   build:
+  #     context: logstash/
+  #     args:
+  #       ELK_VERSION: $ELK_VERSION
+  #   volumes:
+  #     - type: bind
+  #       source: ./logstash/config/logstash.yml
+  #       target: /usr/share/logstash/config/logstash.yml
+  #       read_only: true
+  #     - type: bind
+  #       source: ./logstash/pipeline
+  #       target: /usr/share/logstash/pipeline
+  #       read_only: true
+  #     - type: bind
+  #       source: ./Shanghai
+  #       target: /etc/localtime
+  #       read_only: true
+  #   ports:
+  #     - "5044:5044"
+  #     # - "5000:5000/tcp"
+  #     # - "5000:5000/udp"
+  #     - "9600:9600"
+  #   environment:
+  #     LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+  #   networks:
+  #     - elk
+  #   depends_on:
+  #     - elasticsearch
+  #     - kafka
 
   kibana:
     build:
