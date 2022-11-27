@@ -52,12 +52,15 @@ output.elasticsearch:
   hosts: ["elasticsearch:9200"]
   username: "elastic"
   password: "changeme"
-  index: "lzxapplogs-%{[business]}-%{+yyyy.MM.dd}"
+  index: "lzxshardslogs-%{[business]}-%{+yyyy.MM.dd}"
 
+setup.template.settings:
+   index.number_of_shards: 3
+   index.number_of_replicas: 1
 setup.ilm.enabled: false
 setup.template.fields: "applogsfields.yml"
-setup.template.name: "lzxapplogs"
-setup.template.pattern: "lzxapplogs-*"
+setup.template.name: "lzxshardslogs"
+setup.template.pattern: "lzxshardslogs-*"
 setup.template.enabled: true
 setup.template.overwrite: true
 monitoring.enabled: false
