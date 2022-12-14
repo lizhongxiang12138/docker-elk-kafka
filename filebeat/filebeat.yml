@@ -29,18 +29,22 @@ processors:
       source: >
         function process(event) {
             var dateUnix= event.Get("timestamp");
-            var date = new Date(1000*dateUnix);
-            var Y = date.getFullYear() + '-';
-            var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
-            var D = date.getDate() <10 ? '0'+date.getDate()+' '  : date.getDate() + ' ';
-            var h = date.getHours() < 10 ? '0'+ date.getHours() + ':' : date.getHours() + ':';
-            var m = date.getMinutes() < 10 ? '0' + date.getMinutes() + ':' : date.getMinutes() + ':';
-            var s = date.getSeconds() < 10 ? '0'+date.getSeconds() : date.getSeconds();
-            var dateStr = Y+M+D+h+m+s
-            event.Put("start_time",dateStr);
+            if (dateUnix) {
+              var date = new Date(1000*dateUnix);
+              var Y = date.getFullYear() + '-';
+              var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+              var D = date.getDate() <10 ? '0'+date.getDate()+' '  : date.getDate() + ' ';
+              var h = date.getHours() < 10 ? '0'+ date.getHours() + ':' : date.getHours() + ':';
+              var m = date.getMinutes() < 10 ? '0' + date.getMinutes() + ':' : date.getMinutes() + ':';
+              var s = date.getSeconds() < 10 ? '0'+date.getSeconds() : date.getSeconds();
+              var dateStr = Y+M+D+h+m+s
+              event.Put("start_time",dateStr);
+            }
         }
   - timestamp:
       field: start_time
+      # 使用我国东八区时间  解析log时间
+      timezone: Asia/Shanghai
       layouts:
         - '2006-01-02 15:04:05'
         - '2006-01-02 15:04:05.999'
